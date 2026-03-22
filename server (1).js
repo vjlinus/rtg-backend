@@ -3,17 +3,19 @@ const cors = require('cors');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ['https://vjlinus.github.io', 'http://localhost', 'http://127.0.0.1'],
+  methods: ['POST', 'GET'],
+  allowedHeaders: ['Content-Type']
+}));
 
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-// Health check
 app.get('/', (req, res) => {
   res.json({ status: 'Reviews to Growth API is running' });
 });
 
-// Proxy endpoint
 app.post('/generate', async (req, res) => {
   const { review, senderName, stars } = req.body;
 
