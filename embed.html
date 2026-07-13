@@ -114,32 +114,32 @@
   <div class="footer">Powered by Reviews to Growth · AI review engine for restaurants &amp; cafés</div>
 </div>
 <script>
-  const BACKEND_URL = 'https://rtg-backend-5krcyglft-jasons-projects-f50ce664.vercel.app';
-
+  const BACKEND_URL = 'https://rtg-backend.vercel.app';
+ 
   let selectedStars = 5;
-
+ 
   const samples = {
     positive: { stars: 5, text: "Absolutely loved this place! The biryani was incredibly flavorful — one of the best I've had in the city. Service was warm and the staff were so attentive. Will definitely be back with family!" },
     negative: { stars: 2, text: "Very disappointed. Waited 45 minutes for our food and it came out cold. The waiter was dismissive when we asked for an update. Expected much better for the price point." }
   };
-
+ 
   function setStars(n) {
     selectedStars = n;
     document.querySelectorAll('.star').forEach(s => { s.classList.toggle('lit', parseInt(s.dataset.v) <= n); });
   }
-
+ 
   function loadSample(type) {
     const s = samples[type];
     document.getElementById('reviewInput').value = s.text;
     setStars(s.stars);
   }
-
+ 
   function showError(msg) {
     const box = document.getElementById('errorBox');
     box.textContent = msg;
     box.style.display = msg ? 'block' : 'none';
   }
-
+ 
   async function generateResponse() {
     const review = document.getElementById('reviewInput').value.trim();
     if (!review) { showError('Please paste a review first.'); return; }
@@ -182,7 +182,7 @@
     btn.disabled = false;
     btn.textContent = 'Generate AI Response ↗';
   }
-
+ 
   function copyResponse() {
     const text = document.getElementById('respBody').textContent;
     navigator.clipboard.writeText(text).then(() => {
