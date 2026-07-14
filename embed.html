@@ -114,7 +114,7 @@
   <div class="footer">Powered by Reviews to Growth · AI review engine for restaurants &amp; cafés</div>
 </div>
 <script>
-  const BACKEND_URL = 'https://rtg-backend.vercel.app';
+  const API_KEY = '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';
  
   let selectedStars = 5;
  
@@ -156,19 +156,33 @@
     copyBtn.style.display = 'none';
     body.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
     meta.textContent = '';
+ 
+    const starLabel = ['one-star (very unhappy)','two-star (unhappy)','three-star (neutral/mixed)','four-star (happy)','five-star (delighted)'][selectedStars - 1];
+    const nameInstruction = senderName ? `Address the reviewer by their first name "${senderName}" naturally within the reply — not just at the start.` : 'Do not address the reviewer by name.';
+    const prompt = `You are helping the team at "Ember & Grain" write a warm, genuine reply to a Google review. This is a ${starLabel} review. Write a professional but human-sounding response in under 90 words. ${nameInstruction} Be specific to what the customer mentioned. Do not open with "Thank you for your feedback." End the reply with "— Ember & Grain Team" on a new line. Sound like a real caring team, not a corporate script.\n\nCustomer review: "${review}"\n\nWrite only the reply text, nothing else.`;
+ 
     const t0 = Date.now();
     try {
-      const res = await fetch(`${BACKEND_URL}/api/generate`, {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ review, senderName, stars: selectedStars })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || `Server error ${res.status}`);
+        throw new Error(err?.error?.message || `API error ${res.status}`);
       }
       const data = await res.json();
-      const text = data?.response;
+      const text = data?.content?.[0]?.text;
       if (!text) throw new Error('Empty response received.');
       const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
       body.textContent = text;
